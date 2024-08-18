@@ -15,7 +15,7 @@ https://github.com/microsoft/vscode-webview-ui-toolkit-samples/blob/main/default
 https://github.com/KumarVariable/vscode-extension-sidebar-html/blob/master/src/customSidebarViewProvider.ts
 */
 
-type SecretKey = "apiKey" | "openRouterApiKey" | "awsAccessKey" | "awsSecretKey"
+type SecretKey = "apiKey" | "openRouterApiKey" | "awsAccessKey" | "awsSecretKey" | "sapAiCoreClientId" | "sapAiCoreClientSecret"
 type GlobalStateKey =
 	| "apiProvider"
 	| "apiModelId"
@@ -23,6 +23,8 @@ type GlobalStateKey =
 	| "maxRequestsPerTask"
 	| "lastShownAnnouncementId"
 	| "customInstructions"
+	| "sapAiCoreTokenUrl" 
+	| "sapAiCoreBaseUrl"
 	| "taskHistory"
 
 export class ClaudeDevProvider implements vscode.WebviewViewProvider {
@@ -279,6 +281,10 @@ export class ClaudeDevProvider implements vscode.WebviewViewProvider {
 								awsAccessKey,
 								awsSecretKey,
 								awsRegion,
+								sapAiCoreClientId,
+								sapAiCoreClientSecret,
+								sapAiCoreTokenUrl,
+								sapAiCoreBaseUrl,
 							} = message.apiConfiguration
 							await this.updateGlobalState("apiProvider", apiProvider)
 							await this.updateGlobalState("apiModelId", apiModelId)
@@ -287,6 +293,10 @@ export class ClaudeDevProvider implements vscode.WebviewViewProvider {
 							await this.storeSecret("awsAccessKey", awsAccessKey)
 							await this.storeSecret("awsSecretKey", awsSecretKey)
 							await this.updateGlobalState("awsRegion", awsRegion)
+							await this.storeSecret("sapAiCoreClientId", sapAiCoreClientId)
+							await this.storeSecret("sapAiCoreClientSecret", sapAiCoreClientSecret)
+							await this.updateGlobalState("sapAiCoreTokenUrl", sapAiCoreTokenUrl)
+							await this.updateGlobalState("sapAiCoreBaseUrl", sapAiCoreBaseUrl)
 							this.claudeDev?.updateApi(message.apiConfiguration)
 						}
 						await this.postStateToWebview()
@@ -551,6 +561,10 @@ export class ClaudeDevProvider implements vscode.WebviewViewProvider {
 			maxRequestsPerTask,
 			lastShownAnnouncementId,
 			customInstructions,
+			sapAiCoreClientId,
+			sapAiCoreClientSecret,
+			sapAiCoreTokenUrl,
+			sapAiCoreBaseUrl,
 			taskHistory,
 		] = await Promise.all([
 			this.getGlobalState("apiProvider") as Promise<ApiProvider | undefined>,
@@ -563,6 +577,10 @@ export class ClaudeDevProvider implements vscode.WebviewViewProvider {
 			this.getGlobalState("maxRequestsPerTask") as Promise<number | undefined>,
 			this.getGlobalState("lastShownAnnouncementId") as Promise<string | undefined>,
 			this.getGlobalState("customInstructions") as Promise<string | undefined>,
+			this.getSecret("sapAiCoreClientId") as Promise<string | undefined>,
+			this.getSecret("sapAiCoreClientSecret") as Promise<string | undefined>,
+			this.getGlobalState("sapAiCoreTokenUrl") as Promise<string | undefined>,
+			this.getGlobalState("sapAiCoreBaseUrl") as Promise<string | undefined>,
 			this.getGlobalState("taskHistory") as Promise<HistoryItem[] | undefined>,
 		])
 
@@ -589,6 +607,10 @@ export class ClaudeDevProvider implements vscode.WebviewViewProvider {
 				awsAccessKey,
 				awsSecretKey,
 				awsRegion,
+				sapAiCoreClientId,
+				sapAiCoreClientSecret,
+				sapAiCoreTokenUrl,
+				sapAiCoreBaseUrl,
 			},
 			maxRequestsPerTask,
 			lastShownAnnouncementId,
